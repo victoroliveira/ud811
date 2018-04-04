@@ -1,6 +1,6 @@
 # Udacity UD811 Course Material
 
-These are the course materials for UD811.
+These are the course materials for UD811 - PWA.
 
 
 ## Firebase Weather API
