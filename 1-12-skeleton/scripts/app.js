@@ -183,14 +183,12 @@
   // Gets a forecast for a specific city and update the card with the data
   app.getForecast = function (key, label) {
     var url = weatherAPIUrlBase + key + '.json';
-    console.log('url: '+url);
     // Make the XHR to get the data, then update the card
     var request = new XMLHttpRequest();
     request.onreadystatechange = function () {
       if (request.readyState === XMLHttpRequest.DONE) {
         if (request.status === 200) {
           var response = JSON.parse(request.response);
-          console.log(response);
           response.key = key;
           response.label = label;
           app.updateForecastCard(response);
@@ -210,23 +208,36 @@
   };
 
   // Load forecasts on app initialization
-  app.saveSelectedCities = function() {
+  app.saveSelectedCities = function () {
     window.localforage.setItem('selectedCities', app.selectedCities);
   };
 
-  document.addEventListener('DOMContentLoaded', function() {
-    window.localforage.getItem('selectedCities', function(err, cityList) {
+  document.addEventListener('DOMContentLoaded', function () {
+    window.localforage.getItem('selectedCities', function (err, cityList) {
       if (cityList) {
         app.selectedCities = cityList;
-        app.selectedCities.forEach(function(city) {
+        app.selectedCities.forEach(function (city) {
           app.getForecast(city.key, city.label);
         });
       } else {
         app.updateForecastCard(injectedForecast);
-        app.selectedCities = [{ key: injectedForecast.key, label: injectedForecast.label }];
+        app.selectedCities = [{
+          key: injectedForecast.key,
+          label: injectedForecast.label
+        }];
         app.saveSelectedCities();
       }
     });
   });
+
+  //Register the service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(function (register) {
+        console.log('Service Worker Registered: ', register);
+      }, function(error) {
+        console.log('Service Worker Register ERROR',error);
+      });
+  }
 
 })();
